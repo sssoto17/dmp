@@ -3,6 +3,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --layout-margin: minmax(1.5rem, 1fr);
+  --layout-content: minmax(0, 1200px);
 }
 
 @theme inline {
@@ -12,15 +15,31 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
+  display: grid;
+  grid-template-columns: var(--layout-margin) var(--layout-content) var(
+      --layout-margin
+    );
+  grid-template-rows: auto 1fr auto;
+  align-content: start;
+
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100svh;
+
+  > header,
+  > main,
+  > footer {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+
+    > * {
+      grid-column: 2;
+    }
+    > .full-bleed {
+      grid-column: 1 / -1;
+    }
+  }
 }
