@@ -1,17 +1,15 @@
 "use server";
-import { cookies } from "next/headers";
 import { getSearch } from "../spotify/data";
 
 export async function handleSearch(
-	prev: Record<string, string> | undefined,
-	formData: FormData,
+  prev: Record<string, string> | undefined,
+  formData: FormData,
 ) {
-	const token = (await cookies()).get("access_token")?.value;
-	const q = formData.get("query")?.toString() || undefined;
+  const q = formData.get("query")?.toString();
 
-	if (!q) return prev;
+  if (!q) return prev;
 
-	const res = await getSearch({ q, type: "artist" }, token);
+  const res = await getSearch({ q, type: "artist" });
 
-	return { ...prev, q, ...res };
+  return { ...prev, q, ...res };
 }
