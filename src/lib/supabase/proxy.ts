@@ -1,12 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import {
-  getAnonProviderToken,
-  refreshAuthProviderToken,
-} from "../spotify/token";
+import Spotify from "../Spotify";
 
 const authRoutes = ["/dashboard", "/library"];
-const publicRoutes = ["/login", "/signup"];
+const publicRoutes = ["/", "/login", "/signup"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse: NextResponse = NextResponse.next({
@@ -35,37 +32,11 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  const user = await supabase.auth.getClaims().then(({ data }) => data?.claims);
+  const { session } = await supabase.auth.getSession().then((res) => res.data);
 
-  // REFRESH TOKEN
-  const hasToken = request.cookies.has("oauth_provider_token");
-
-  if (user && !hasToken) {
-    const { access_token, expires_in, error } =
-      await refreshAuthProviderToken(supabase);
-
-    if (!error) {
-      supabaseResponse.cookies.set("oauth_provider_token", access_token, {
-        maxAge: expires_in,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-      });
-    }
-  }
-
-  if (!user && !hasToken) {
-    const { access_token, expires_in, error } = await getAnonProviderToken();
-
-    if (!error) {
-      supabaseResponse.cookies.set("oauth_provider_token", access_token, {
-        maxAge: expires_in,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-      });
-    }
+  if (!request.cookies.has("oauth_provider_token")) {
+    await Spotify.authorize(supabaseResponse.cookies, session);
   }
 
   // REDIRECT
@@ -73,7 +44,7 @@ export async function updateSession(request: NextRequest) {
   const isPublic = publicRoutes.includes(request.nextUrl.pathname);
 
   if (user && isPublic)
-    return NextResponse.redirect(new URL("/", request.nextUrl));
+    return NextResponse.redirect(new URL("/dashboard", request.nextUrl));
 
   if (!user && isAuth)
     return NextResponse.redirect(new URL("/login", request.nextUrl));

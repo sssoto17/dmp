@@ -4,9 +4,9 @@ import {
   SignInWithPasswordCredentials,
   SignUpWithPasswordCredentials,
 } from "@supabase/supabase-js";
-import { authorizeSpotify, signIn, signOut } from "../auth/session";
-import { createUser } from "../auth/user";
 import { redirect } from "next/navigation";
+import { createUser } from "./user";
+import { authorizeSpotify, signIn, signOut } from "./session";
 
 export type State = {
   user?: {
@@ -27,9 +27,7 @@ function getFormData(formData: FormData) {
 export async function handleSpotifySignIn() {
   const { data, error } = await authorizeSpotify();
 
-  if (error) return console.error(error);
-
-  redirect(data?.url);
+  if (!error) redirect(data?.url);
 }
 
 export async function handleSignIn(
@@ -69,4 +67,6 @@ export async function handleSignOut() {
   if (error) {
     console.log("an error occurred: ", error);
   }
+
+  redirect("/");
 }

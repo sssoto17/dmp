@@ -1,15 +1,16 @@
-import { getAuthUser } from "@/lib/auth/user";
 import Link from "next/link";
 import SignOut from "../SignOut";
+
 import { Suspense } from "react";
+import { verifySession } from "@/lib/auth/dal";
+import Search from "../Search";
 
 export default async function Header() {
   return (
-    <header className="layout-grid sticky top-0 mb-8 w-full bg-white py-4 drop-shadow-lg">
-      <nav className="flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold text-amber-700">
-          DMP
-        </Link>
+    <header className="sticky top-0 z-10 mb-8 w-full bg-white py-4 drop-shadow-lg">
+      <nav className="flex items-center justify-between gap-6">
+        <p className="flex-1"></p>
+        <Search />
         <Suspense>
           <UserBadge />
         </Suspense>
@@ -19,9 +20,9 @@ export default async function Header() {
 }
 
 async function UserBadge() {
-  const { data } = await getAuthUser();
+  const { isAuth } = await verifySession();
 
-  if (!data?.claims)
+  if (!isAuth)
     return (
       <Link
         className="cursor-pointer rounded-md bg-amber-500 px-4 py-1 font-bold text-white hover:bg-amber-400"
@@ -30,8 +31,9 @@ async function UserBadge() {
         Sign in
       </Link>
     );
+
   return (
-    <div className="flex gap-4">
+    <div className="flex items-center gap-4">
       <Avatar url="/dashboard" />
       <SignOut />
     </div>
@@ -41,7 +43,7 @@ async function UserBadge() {
 function Avatar({ url }: { url: string }) {
   return (
     <Link href={url}>
-      <div className="aspect-square w-10 rounded-full bg-linear-to-b from-amber-200 to-fuchsia-400 drop-shadow-lg" />
+      <div className="aspect-square w-8 rounded-full bg-linear-to-b from-amber-200 to-fuchsia-400 drop-shadow-lg" />
     </Link>
   );
 }

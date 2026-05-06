@@ -1,6 +1,6 @@
 "use client";
 
-import { handleSignOut, handleSpotifySignIn } from "@/lib/actions/auth";
+import { handleSignOut, handleSpotifySignIn } from "@/lib/auth/actions";
 
 export default function SignOut() {
   return (

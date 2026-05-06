@@ -2,12 +2,14 @@ import "server-only";
 
 import { cache } from "react";
 import createClient from "../supabase/server";
-import { User, JwtPayload } from "@supabase/supabase-js";
 
 export const verifySession = cache(
   async (): Promise<{
     isAuth: boolean;
-    user?: User | JwtPayload;
+    user?: {
+      id: string;
+      name: string;
+    };
   }> => {
     const supabase = await createClient();
 
@@ -15,6 +17,12 @@ export const verifySession = cache(
 
     if (!data?.claims || error) return { isAuth: false };
 
-    return { isAuth: true, user: data?.claims };
+    return {
+      isAuth: true,
+      user: {
+        id: data?.claims?.session_id,
+        name: data?.claims?.user_metadata?.full_name,
+      },
+    }; // turn user into DTO so only minimum necessary data is returned
   },
 );

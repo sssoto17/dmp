@@ -4,23 +4,12 @@ import createAdminClient from "../supabase/admin";
 
 export async function createUser(user: SignUpWithPasswordCredentials) {
   const supabase = await createClient();
-  return supabase.auth.signUp(user);
+
+  return await supabase.auth.signUp(user);
 }
 
-export async function getAuthUser() {
-  const supabase = await createClient();
-
-  return await supabase.auth.getClaims();
-}
-
-// export async function getAuthUser() {
-//   const supabase = await createClient();
-
-//   if (admin) {
-//     return await supabase.auth.getUser();
-//   } else return await supabase.auth.getClaims();
-// }
-
+// possibly create public users table to manage publicly readable user data
+// instead of fetching as admin
 export async function getUser(id: string) {
   const supabase = await createAdminClient();
 

@@ -1,15 +1,23 @@
 "use server";
-import { getSearch } from "../spotify/data";
+import Spotify from "../Spotify";
 
 export async function handleSearch(
-  prev: Record<string, string> | undefined,
-  formData: FormData,
+  test?: string,
+  // prev: Record<string, string> | undefined,
+  // formData: FormData,
 ) {
-  const q = formData.get("query")?.toString();
+  // if (signal?.aborted) return "abort";
+  // const q = formData.get("search")?.toString();
 
-  if (!q) return prev;
+  // console.log("server:");
+  // return signal;
 
-  const res = await getSearch({ q, type: "artist" });
+  // if (!q) return prev;
 
-  return { ...prev, q, ...res };
+  // // TODO: Filter for artist, albums, tracks
+  const spotify = await Spotify.create();
+  const res = await spotify.search(test as string);
+
+  return res?.artists?.items;
+  // return { ...prev, q, ...res };
 }

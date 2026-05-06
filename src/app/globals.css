@@ -4,42 +4,98 @@
   --background: #ffffff;
   --foreground: #171717;
 
-  --layout-margin: minmax(1.5rem, 1fr);
-  --layout-content: minmax(0, 1200px);
+  --layout-margin-min: 1.5rem;
+  --layout-content-max: 1200px;
+
+  --layout-margin: minmax(0, 1fr);
+  --layout-content: minmax(0, var(--layout-content-max));
+
+  --font-humanist:
+    Seravek, "Gill Sans Nova", Ubuntu, Calibri, "DejaVu Sans", source-sans-pro,
+    sans-serif;
+}
+
+@theme {
+  --font-sans: var(--font-humanist);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  /* --font-sans: var(--font-humanist); */
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   display: grid;
-  grid-template-columns: var(--layout-margin) var(--layout-content) var(
-      --layout-margin
-    );
-  grid-template-rows: auto 1fr auto;
-
+  grid-template-rows: [sidebar-start header] auto [main] 1fr [footer sidebar-end] auto;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
   min-height: 100svh;
 
   > header,
   > main,
+  > aside,
   > footer {
     display: grid;
     grid-template-columns: subgrid;
-    grid-column: 1 / -1;
     align-content: start;
+  }
 
+  > header {
+    grid-area: header;
     > * {
-      grid-column: 2;
-    }
-    > .full-bleed {
-      grid-column: 1 / -1;
+      grid-area: header-content;
     }
   }
+
+  > main {
+    grid-area: main;
+
+    > * {
+      grid-column: content;
+    }
+  }
+
+  > footer {
+    grid-area: footer;
+
+    > * {
+      grid-column: footer-content;
+    }
+  }
+
+  > aside {
+    grid-area: sidebar;
+
+    > * {
+      grid-column: sidebar-content;
+    }
+  }
+}
+
+[data-layout="public"] {
+  --layout-margin: minmax(var(--layout-margin-min), 1fr);
+  grid-template-columns:
+    [full-bleed-start main-start header-start
+    footer-start margin-left] var(--layout-margin)
+    [content header-content footer-content] var(--layout-content)
+    [margin-right] var(--layout-margin)
+    [footer-end header-end main-end full-bleed-end];
+}
+
+[data-layout="auth"] {
+  grid-template-columns:
+    [sidebar-start footer-start] var(--layout-margin-min)
+    [sidebar-content footer-content-start] auto var(--layout-margin-min)
+    [sidebar-end full-bleed-start header-start gutter-left] var(
+      --layout-margin-min
+    )
+    [header-content-start main-start margin-left] var(--layout-margin)
+    [content] var(--layout-content)
+    [margin-right] var(--layout-margin)
+    [header-content-end footer-content-end main-end gutter-right] var(
+      --layout-margin-min
+    )
+    [footer-end header-end full-bleed-end];
 }

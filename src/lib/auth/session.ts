@@ -4,6 +4,7 @@ import {
 } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import createClient from "../supabase/server";
+import Spotify from "../Spotify";
 
 // TODO: Link regular user with Spotify account
 // Possibly link several emails to same account + Spotify
@@ -11,17 +12,21 @@ export async function signIn(user: SignInWithPasswordCredentials) {
   const supabase = await createClient();
 
   return await supabase.auth.signInWithPassword(user);
+
+  // MAKE SPOTIFY AUTH MANDATORY; ALL USERS MUST BE CONNECTED TO SPOTIFY
 }
 
 export async function authorizeSpotify() {
   const supabase = await createClient();
 
+  // console.log(`${process.env.SITE_URL}/auth/callback`);
+
   return await supabase.auth.signInWithOAuth({
     provider: "spotify",
     options: {
-      redirectTo: "http://127.0.0.1:3000/auth/callback",
+      redirectTo: `${process.env.SITE_URL}/auth/callback`,
       scopes:
-        "user-read-email user-read-private user-top-read user-read-playback-position streaming user-read-currently-playing user-modify-playback-state user-read-playback-state",
+        "user-read-email user-read-private user-top-read user-read-playback-position streaming user-read-currently-playing user-read-recently-played user-modify-playback-state user-read-playback-state",
     },
   });
 }
@@ -30,10 +35,11 @@ export async function signOut(scope: SignOutScope) {
   const store = await cookies();
   const supabase = await createClient();
 
-  supabase.auth.onAuthStateChange((event) => {
+  supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === "SIGNED_OUT") {
       store.delete("oauth_provider_token");
-      store.delete("oauth_provider_refresh_token");
+
+      await Spotify.authorize(store, session);
     }
   });
 

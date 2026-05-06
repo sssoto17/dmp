@@ -1,6 +1,6 @@
 "use client";
 
-import { handleSignIn, type State } from "@/lib/actions/auth";
+import { handleSignIn, type State } from "@/lib/auth/actions";
 import Form from "next/form";
 import { useActionState } from "react";
 import TextInput from "./forms/Input";

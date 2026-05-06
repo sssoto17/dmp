@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { Buffer } from "node:buffer";
 
 export function encode(id: string, secret: string): string {
@@ -6,13 +5,23 @@ export function encode(id: string, secret: string): string {
   return Buffer.from(str).toString("base64");
 }
 
-export async function get(endpoint: string) {
-  const store = await cookies();
-  const token = store.get("oauth_provider_token")?.value;
+export const secureCookieProps = (
+  name: string,
+  value: string,
+  maxAge: number,
+) => ({
+  name,
+  value,
+  maxAge,
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+});
 
-  return await fetch(endpoint, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }).then((res) => res.json());
+export function mountScript() {
+  const script = document.createElement("script");
+  script.src = "https://sdk.scdn.co/spotify-player.js";
+  script.async = true;
+
+  document.body.appendChild(script);
 }

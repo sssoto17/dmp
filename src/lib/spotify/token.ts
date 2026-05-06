@@ -1,5 +1,10 @@
+import "server-only";
+
 import { SupabaseClient } from "@supabase/supabase-js";
-import { Payload, Credentials } from "./types";
+
+// OLD || ASYNC FUNCTIONS
+
+import { SpotifyCredentials, SpotifyPayload } from "./schema";
 import { encode } from "./utils";
 
 const {
@@ -14,23 +19,23 @@ const headers: Record<string, string> = {
 };
 
 // CLIENT CREDENTIALS
-export async function getAnonProviderToken(): Promise<Credentials> {
-  const payload: Payload = {
+export async function getAnonProviderToken(): Promise<SpotifyCredentials> {
+  const payload: SpotifyPayload = {
     grant_type: "client_credentials",
   };
 
   return await fetch(url, {
     method: "POST",
     headers,
-    body: new URLSearchParams(payload),
+    body: new URLSearchParams(payload as Record<string, string>),
   }).then((res) => res.json());
 }
 
 // AUTHORIZATION CODE
 export async function refreshAuthProviderToken(
   supabase: SupabaseClient,
-): Promise<Credentials> {
-  const payload: Payload = {
+): Promise<SpotifyCredentials> {
+  const payload: SpotifyPayload = {
     grant_type: "refresh_token",
   };
 
@@ -46,6 +51,6 @@ export async function refreshAuthProviderToken(
   return await fetch(url, {
     method: "POST",
     headers,
-    body: new URLSearchParams(payload),
+    body: new URLSearchParams(payload as Record<string, string>),
   }).then((res) => res.json());
 }

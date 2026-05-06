@@ -1,20 +1,23 @@
-import Search from "@/components/Search";
 import { verifySession } from "@/lib/auth/dal";
 import { Suspense } from "react";
 
 export default function Home() {
   return (
-    <main className="layout-grid">
+    <main>
       <Suspense>
         <Welcome />
       </Suspense>
-      <Search />
     </main>
   );
 }
 
 async function Welcome() {
   const { isAuth, user } = await verifySession();
+
+  // const spotify = await Spotify.create();
+  // const current = await spotify.player.playback_state();
+
+  // console.log(current);
 
   if (!isAuth)
     return (
@@ -25,7 +28,8 @@ async function Welcome() {
 
   return (
     <section>
-      <h1>Hello {user?.user_metadata?.full_name}!</h1>
+      <h1>Hello {user?.name}!</h1>
+      {/* <h2>{userTest?.country}</h2> */}
     </section>
   );
 }
